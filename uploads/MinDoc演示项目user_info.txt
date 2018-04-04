@@ -1,0 +1,3 @@
+跳板机地址： http://106.15.228.227 用户名：qiupengfei 密码：XqGt1hZn9nRTyO7M 密钥密码：VlTYHiVnjq7JNdjw 
+密钥下载url: http://106.15.228.227/juser/key/down/?uuid=fc9408cb099e4005a57870c9cc66480f 该账号密码可以登陆web和跳板
+ec2-54-169-131-79.ap-southeast-1.compute.amazonaws.com:8181
