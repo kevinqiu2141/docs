@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
+	"github.com/1009049035/mindoc/conf"
 	"strings"
 	"os"
 	"path/filepath"
 	"strconv"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/lifei6671/mindoc/cache"
+	"github.com/1009049035/mindoc/cache"
 	"encoding/json"
 )
 

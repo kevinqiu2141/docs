@@ -46,7 +46,7 @@
   name = "github.com/kardianos/service"
 
 [[constraint]]
-  name = "github.com/lifei6671/gocaptcha"
+  name = "github.com/1009049035/gocaptcha"
   version = "0.1.0"
 
 [[constraint]]

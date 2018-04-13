@@ -8,8 +8,8 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
-	"github.com/lifei6671/mindoc/utils"
+	"github.com/1009049035/mindoc/conf"
+	"github.com/1009049035/mindoc/utils"
 	"strings"
 )
 

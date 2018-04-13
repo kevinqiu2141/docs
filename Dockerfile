@@ -7,9 +7,9 @@ RUN cp   /etc/apk/repositories /etc/apk/repositories.back && \
 
 RUN apk add --update bash git make gcc g++
 
-ADD . /go/src/github.com/lifei6671/mindoc
+ADD . /go/src/github.com/1009049035/mindoc
 
-WORKDIR /go/src/github.com/lifei6671/mindoc
+WORKDIR /go/src/github.com/1009049035/mindoc
 
 RUN chmod +x start.sh
 

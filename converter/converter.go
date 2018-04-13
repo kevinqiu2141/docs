@@ -14,9 +14,9 @@ import (
 	"os/exec"
 	"errors"
 
-	"github.com/lifei6671/mindoc/utils/filetil"
-	"github.com/lifei6671/mindoc/utils/ziptil"
-	"github.com/lifei6671/mindoc/utils/cryptil"
+	"github.com/1009049035/mindoc/utils/filetil"
+	"github.com/1009049035/mindoc/utils/ziptil"
+	"github.com/1009049035/mindoc/utils/cryptil"
 )
 
 type Converter struct {
@@ -542,25 +542,3 @@ func (this *Converter) convertToDocx() (err error) {
 	}
 	return cmd.Run()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

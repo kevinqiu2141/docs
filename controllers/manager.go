@@ -9,12 +9,12 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
-	"github.com/lifei6671/mindoc/models"
-	"github.com/lifei6671/mindoc/utils"
+	"github.com/1009049035/mindoc/conf"
+	"github.com/1009049035/mindoc/models"
+	"github.com/1009049035/mindoc/utils"
 	"path/filepath"
 	"strconv"
-	"github.com/lifei6671/mindoc/utils/pagination"
+	"github.com/1009049035/mindoc/utils/pagination"
 	"math"
 	"gopkg.in/russross/blackfriday.v2"
 )
@@ -683,20 +683,3 @@ func (c *ManagerController) LabelDelete(){
 		c.JsonResult(0,"ok")
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

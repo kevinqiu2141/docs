@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-cd /go/src/github.com/lifei6671/mindoc/
+cd /go/src/github.com/1009049035/mindoc/
 
-if [ ! -f "/go/src/github.com/lifei6671/mindoc/conf/app.conf" ] ; then
-    cp /go/src/github.com/lifei6671/mindoc/conf/app.conf.example /go/src/github.com/lifei6671/mindoc/conf/app.conf
+if [ ! -f "/go/src/github.com/1009049035/mindoc/conf/app.conf" ] ; then
+    cp /go/src/github.com/1009049035/mindoc/conf/app.conf.example /go/src/github.com/1009049035/mindoc/conf/app.conf
 	sed -i "s#^db_adapter=.*#db_adapter=sqlite3#g" conf/app.conf
 	sed -i "s#^db_database.*#db_database=./database/mindoc.db#g" conf/app.conf
 fi
@@ -78,5 +78,5 @@ fi
 
 sed -i 's/^runmode.*/runmode=prod/g' conf/app.conf
 
-/go/src/github.com/lifei6671/mindoc/mindoc_linux_amd64 install
-/go/src/github.com/lifei6671/mindoc/mindoc_linux_amd64
+/go/src/github.com/1009049035/mindoc/mindoc_linux_amd64 install
+/go/src/github.com/1009049035/mindoc/mindoc_linux_amd64

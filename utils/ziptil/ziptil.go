@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lifei6671/mindoc/utils/filetil"
+	"github.com/1009049035/mindoc/utils/filetil"
 )
 
 //解压zip文件
@@ -171,9 +171,3 @@ func compress(file *os.File, prefix string, zw *zip.Writer) error {
 	}
 	return nil
 }
-
-
-
-
-
-

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
+	"github.com/1009049035/mindoc/conf"
 	"strings"
 )
 
@@ -100,7 +100,3 @@ func (m *Label) FindToPager(pageIndex, pageSize int) (labels []*Label, totalCoun
 
 	return
 }
-
-
-
-

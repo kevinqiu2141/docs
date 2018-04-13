@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
+	"github.com/1009049035/mindoc/conf"
 	"github.com/astaxie/beego"
 )
 

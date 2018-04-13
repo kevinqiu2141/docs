@@ -14,11 +14,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
-	"github.com/lifei6671/mindoc/converter"
-	"github.com/lifei6671/mindoc/utils"
+	"github.com/1009049035/mindoc/conf"
+	"github.com/1009049035/mindoc/converter"
+	"github.com/1009049035/mindoc/utils"
 	"gopkg.in/russross/blackfriday.v2"
-	"github.com/lifei6671/mindoc/utils/ziptil"
+	"github.com/1009049035/mindoc/utils/ziptil"
 )
 
 type BookResult struct {
@@ -436,29 +436,3 @@ func exportMarkdown(p string,parentId int,bookId int) (error){
 	}
 	return nil
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

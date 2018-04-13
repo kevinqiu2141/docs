@@ -3,10 +3,10 @@ package controllers
 import (
 	"net/url"
 	"github.com/astaxie/beego"
-	"github.com/lifei6671/mindoc/models"
-	"github.com/lifei6671/mindoc/utils/pagination"
+	"github.com/1009049035/mindoc/models"
+	"github.com/1009049035/mindoc/utils/pagination"
 	"math"
-	"github.com/lifei6671/mindoc/conf"
+	"github.com/1009049035/mindoc/conf"
 )
 
 type HomeController struct {

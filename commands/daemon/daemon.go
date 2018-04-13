@@ -6,9 +6,9 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/kardianos/service"
-	"github.com/lifei6671/mindoc/commands"
-	"github.com/lifei6671/mindoc/conf"
-	"github.com/lifei6671/mindoc/controllers"
+	"github.com/1009049035/mindoc/commands"
+	"github.com/1009049035/mindoc/conf"
+	"github.com/1009049035/mindoc/controllers"
 )
 
 type Daemon struct {

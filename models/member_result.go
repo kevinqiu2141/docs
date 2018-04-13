@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/mindoc/conf"
+	"github.com/1009049035/mindoc/conf"
 	"time"
 )
 
@@ -107,33 +107,3 @@ func (m *MemberRelationshipResult) FindNotJoinUsersByAccount(bookId, limit int,a
 
 	return members,err
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
