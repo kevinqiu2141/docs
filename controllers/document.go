@@ -13,7 +13,7 @@ import (
 	"time"
 	"net/url"
 	"image/png"
-
+	"path"
 	"bytes"
 
 	"github.com/PuerkitoBio/goquery"
@@ -398,6 +398,171 @@ func (c *DocumentController) Create() {
 	} else {
 		c.JsonResult(0, "ok", document)
 	}
+}
+
+func (c *DocumentController) Import() {
+	identify := c.GetString("identify")
+	doc_identify := c.GetString("doc_identify")
+	doc_name := c.GetString("doc_name")
+	parent_id, _ := c.GetInt("parent_id", 0)
+
+	if identify == "" {
+		c.JsonResult(6001, "参数错误")
+	}
+
+	if doc_name == "" {
+		c.JsonResult(6004, "文档名称不能为空")
+	}
+
+	if doc_identify != "" {
+		if ok, err := regexp.MatchString(`[a-z]+[a-zA-Z0-9_.\-]*$`, doc_identify); !ok || err != nil {
+			c.JsonResult(6003, "文档标识只能包含小写字母、数字，以及“-”、“.”和“_”符号")
+		}
+
+		d, _ := models.NewDocument().FindByFieldFirst("identify", doc_identify)
+		if d.DocumentId > 0 && d.DocumentId != doc_id {
+			c.JsonResult(6006, "文档标识已被使用")
+		}
+	}
+
+	book_id := 0
+
+	// 如果是超级管理员则不判断权限
+	if c.Member.IsAdministrator() {
+		book, err := models.NewBook().FindByFieldFirst("identify", identify)
+		if err != nil {
+			beego.Error(err)
+			c.JsonResult(6002, "项目不存在或权限不足")
+		}
+
+		book_id = book.BookId
+	} else {
+		bookResult, err := models.NewBookResult().FindByIdentify(identify, c.Member.MemberId)
+
+		if err != nil || bookResult.RoleId == conf.BookObserver {
+			beego.Error("FindByIdentify => ", err)
+			c.JsonResult(6002, "项目不存在或权限不足")
+		}
+
+		book_id = bookResult.BookId
+	}
+
+	if parent_id > 0 {
+		doc, err := models.NewDocument().Find(parent_id)
+		if err != nil || doc.BookId != book_id {
+			c.JsonResult(6003, "父分类不存在")
+		}
+	}
+
+	doc := models.NewDocument()
+	doc.DocumentName = doc_name
+	doc.Identify = doc_identify
+	doc.ParentId = parent_id
+	doc.MemberId = c.Member.MemberId
+
+	if c.Member.IsAdministrator() {
+		book, err := models.NewBook().FindByFieldFirst("identify", identify)
+		if err != nil {
+			beego.Error(err)
+			c.JsonResult(6002, "项目不存在或权限不足")
+		}
+
+		book_id = book.BookId
+	} else {
+		bookResult, err := models.NewBookResult().FindByIdentify(identify, c.Member.MemberId)
+
+		if err != nil || bookResult.RoleId == conf.BookObserver {
+			beego.Error("FindByIdentify => ", err)
+			c.JsonResult(6002, "项目不存在或权限不足")
+		}
+
+		book_id = bookResult.BookId
+	}
+
+	doc.BookId = book_id
+
+	var pandoc = path.Join(beego.AppConfig.String("pandoc_path"), "pandoc")
+	f, h, err := c.GetFile("uploadname")
+	if f == nil {
+		beego.Error("Can't Get File from form")
+	}
+	if err != nil {
+		beego.Error(err)
+	}
+	defer f.Close()
+	var uploadpath string
+	uploadpath = path.Join("uploads/import_dir/", strconv.FormatInt(time.Now().UnixNano(), 16))
+	var result bool
+	result, err = PathExists(uploadpath)
+	if result != true {
+		os.Mkdir(uploadpath, 0777)
+	}
+	var file *os.File
+	file, err = os.Create(uploadpath + "/" + h.Filename)
+	if err != nil {
+		beego.Error("failed to create")
+	}
+	defer file.Close()
+	io.Copy(file, f)
+	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
+	var webmediapath = path.Join(beego.AppConfig.String("baseurl"), localmediapath)
+
+	if strings.HasSuffix(h.FileName, ".doc") {
+		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
+		cmd.Dir = beego.AppConfig.String("convert_dir")
+		output, err1 := cmd.Output()
+		if err1 != nil {
+			beego.Error(err1)
+			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
+		}
+		cmdcopyfile.Run()
+		if err != nil {
+			beego.Error(err)
+			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
+		}
+		doc.release = string(output)
+
+	} else if strings.HasSuffix(h.FileName, ".docx") {
+		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
+		cmd.Dir = beego.AppConfig.String("convert_dir")
+		output, err1 := cmd.Output()
+		if err1 != nil {
+			beego.Error(err1)
+			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
+		}
+		cmdcopyfile.Run()
+		if err != nil {
+			beego.Error(err)
+			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
+		}
+		doc.release = string(output)
+
+	} else if strings.HasSuffix(h.FileName, ".pdf") {
+		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
+		cmd.Dir = beego.AppConfig.String("convert_dir")
+		output, err1 := cmd.Output()
+		if err1 != nil {
+			beego.Error(err1)
+			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
+		}
+		cmdcopyfile.Run()
+		if err != nil {
+			beego.Error(err)
+			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
+		}
+		doc.release = string(output)
+
+	}
+	if err := document.InsertOrUpdate(); err != nil {
+		beego.Error("InsertOrUpdate => ", err)
+		c.JsonResult(6005, "保存失败")
+	} else {
+		c.JsonResult(0, "ok", document)
+	}
+
 }
 
 // 上传附件或图片
