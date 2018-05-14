@@ -126,44 +126,6 @@
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-<style>
-    #importuploader{float:left;line-height: 1.428571429;vertical-align: middle;margin: 0 6px 0 0;position: relative}
-    #importuploader div,#importuploader div input{width: 94px;height: 38px;}
-    #importuploader div.webuploader-pick{padding: 8px 15px;}
-</style>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">导入文件</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            </div>
-			<form action={{urlfor "DocumentController.Import"}} method="POST">
-				<input type="hidden" name="identify" value="{{.Model.Identify}}">
-				<input type="hidden" name="doc_id" value="0">
-				<input type="hidden" name="parent_id" value="0">
-            <div class="modal-body" style="overflow:hidden;">
-                <div class="form-group">
-                    <label for="doc_name">文档名称</label>
-                    <input class="form-control" name="doc_name" id="doc_name" placeholder="文档的名称">
-                </div>
-                <div class="form-group">
-                    <label for="documentIdentify">文档标识</label>
-                    <input class="form-control" id="documentIdentify" name="doc_identify" placeholder="文档的标识">
-                </div>
-                <div id="uploader-demo" style="margin-top:30px;">
-                    <div id="fileList" class="uploader-list" style="border:1px solid #ccc;padding:5px;min-height:80px;margin-bottom:20px;"></div>
-                    <div id="importuploader">选择文件</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="submit" id="ctlBtn" class="btn btn-primary">提交更改</button>
-            </div>
-			</form>
-        </div>/.modal-content
-    </div>/.modal
-</div>
 <div class="modal fade" id="addDocumentModal" tabindex="-1" role="dialog" aria-labelledby="addDocumentModalLabel">
     <div class="modal-dialog" role="document">
         <form method="post" action="{{urlfor "DocumentController.Create" ":key" .Model.Identify}}" id="addDocumentForm" class="form-horizontal">
@@ -310,6 +272,39 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+                <form action={{urlfor "DocumentController.Import"}} enctype="multipart/form-data" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">导入文件</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+                                <input type="hidden" name="identify" value="{{.Model.Identify}}">
+                                <input type="hidden" name="doc_id" value="0">
+                                <input type="hidden" name="parent_id" value="0">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>文档的名称</label>
+                    <input class="form-control" name="doc_name" placeholder="文档的名称">
+                </div>
+                <div class="form-group">
+                    <label for="documentIdentify">文档的标识</label>
+                    <input class="form-control" name="doc_identify" placeholder="文档的标识">
+                </div>
+                <div id="uploader-demo" style="margin-top:30px;">
+                    <input type="file" name="uploadname" vaule="选择文件"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交更改</button>
+            </div>
+        </div>
+                </form>
+    </div>
+</div>
+
 <template id="template-normal">
 {{template "document/template_normal.tpl"}}
 </template>
@@ -406,94 +401,6 @@
         });
     });
 
-// 初始化Web Uploader
-var $btn = $('#ctlBtn'),
-    state = 'pending',
-    uploader;
-    try{
-        var importuploader = WebUploader.create({
-
-            // swf文件路径
-            swf: '/static/webuploader/Uploader.swf',
-
-            // 文件接收服务端。
-            server: "{{urlfor "DocumentController.Import"}}",
-
-            // 选择文件的按钮。可选。
-            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-            pick: '#importuploader',
-
-            // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
-            resize: false
-        })
-        // 当有文件被添加进队列的时候
-        .on( 'fileQueued', function( file ) {
-            $('#fileList').append( '<div id="' + file.id + '" class="item">' +
-                '<h4 class="info">' + file.name + '</h4>' +
-                '<p class="state">等待上传...</p>' +
-            '</div>' );
-        })
-        // 文件上传过程中创建进度条实时显示。
-        .on( 'uploadProgress', function( file, percentage ) {
-            var $li = $( '#'+file.id ),
-                $percent = $li.find('.progress .progress-bar');
-
-            // 避免重复创建
-            if ( !$percent.length ) {
-                $percent = $('<div class="progress progress-striped active">' +
-                  '<div class="progress-bar" role="progressbar" style="width: 0%">' +
-                  '</div>' +
-                '</div>').appendTo( $li ).find('.progress-bar');
-            }
-
-            $li.find('p.state').text('上传中');
-
-            $percent.css( 'width', percentage * 100 + '%' );
-        })
-        // 文件上传过程中创建进度条实时显示。
-        .on( 'uploadProgress', function( file, percentage ) {
-            var $li = $( '#'+file.id ),
-                $percent = $li.find('.progress span');
-
-            // 避免重复创建
-            if ( !$percent.length ) {
-                $percent = $('<p class="progress"><span></span></p>')
-                        .appendTo( $li )
-                        .find('span');
-            }
-
-            $percent.css( 'width', percentage * 100 + '%' );
-        }).on( 'uploadSuccess', function( file ) {
-            $( '#'+file.id ).find('p.state').text('已上传');
-        }).on( 'uploadError', function( file ) {
-            $( '#'+file.id ).find('p.state').text('上传出错');
-        }).on( 'uploadComplete', function( file ) {
-            $( '#'+file.id ).find('.progress').fadeOut();
-        }).on( 'all', function( type ) {
-            if ( type === 'startUpload' ) {
-                state = 'uploading';
-            } else if ( type === 'stopUpload' ) {
-                state = 'paused';
-            } else if ( type === 'uploadFinished' ) {
-                state = 'done';
-            }
-
-            if ( state === 'uploading' ) {
-                $btn.text('暂停上传');
-            } else {
-                $btn.text('开始上传');
-            }
-        });
-        $btn.on( 'click', function() {
-            if ( state === 'uploading' ) {
-                importuploader.stop();
-            } else {
-                importuploader.upload();
-            }
-        });
-    }catch(e){
-        console.log(e);
-    }
 </script>
 </body>
 </html>

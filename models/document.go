@@ -153,7 +153,6 @@ func (m *Document) ReleaseContent(bookId int) {
 			continue
 		}
 		if item.Content != "" {
-			if item.
 			item.Release = item.Content
 			bufio := bytes.NewReader([]byte(item.Content))
 			//解析文档中非本站的链接，并设置为新窗口打开

@@ -491,12 +491,16 @@ func (c *DocumentController) Import() {
 	var result bool
 	result, err = PathExists(uploadpath)
 	if result != true {
-		os.Mkdir(uploadpath, 0777)
+		err = os.MkdirAll(uploadpath, 0777)
+		if err != nil {
+			beego.Error("failed to create uploadpath: ", err)
+		}
+		
 	}
 	var file *os.File
 	file, err = os.Create(uploadpath+"/"+h.Filename)
 	if err != nil {
-		beego.Error("failed to create")
+		beego.Error("failed to create: ", err)
 	}
 	defer file.Close()
 	io.Copy(file, f)
@@ -505,8 +509,7 @@ func (c *DocumentController) Import() {
 
 	if strings.HasSuffix(h.Filename, ".doc") {
 		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
-		cmd.Dir = beego.AppConfig.String("convert_dir")
+		cmdcopyfile := exec.Command("copy", "-r", webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
@@ -518,19 +521,18 @@ func (c *DocumentController) Import() {
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
-
+		doc.Content = string(output)
 	} else if strings.HasSuffix(h.Filename, ".docx") {
 		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
-		cmd.Dir = beego.AppConfig.String("convert_dir")
+		cmdcopyfile := exec.Command("copy", "-r", webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
-			beego.Error(err1)
+			beego.Error(err1, output)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
 		cmdcopyfile.Run()
 		if err != nil {
-			beego.Error(err)
+			beego.Error(err, output)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
@@ -553,7 +555,7 @@ func (c *DocumentController) Import() {
 
 	}
 	if err := doc.InsertOrUpdate(); err != nil {
-		beego.Error("InsertOrUpdate => ", err)
+		beego.Error("InsertOrUpdate => ", err, doc.BookId, doc.ParentId)
 		c.JsonResult(6005, "保存失败")
 	} else {
 		c.JsonResult(0, "ok", doc)
@@ -1479,3 +1481,5 @@ func EachFun(prefix, dpath string, c *DocumentController, book *models.BookResul
 	f.WriteString(html)
 	f.Close()
 }
+
+
