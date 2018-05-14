@@ -404,7 +404,7 @@ func (c *DocumentController) Create() {
 func (c *DocumentController) Import() {
 	identify := c.GetString("identify")
 	doc_name := c.GetString("doc_name")
-	doc_identify := c.GetString("doc_identify")+"_"+doc_name
+	doc_identify := c.GetString("doc_identify")+strconv.FormatInt(time.Now().UnixNano(), 16)
 	parent_id, _ := c.GetInt("parent_id", 0)
 
 	if identify == "" {
