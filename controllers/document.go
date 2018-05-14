@@ -515,9 +515,9 @@ func (c *DocumentController) Import() {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		err = cmdcopyfile.Run()
-		if err != nil {
-			beego.Error(err)
+		output2, err2 = cmdcopyfile.output()
+		if err2 != nil {
+			beego.Error(err2, output2)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
@@ -529,9 +529,9 @@ func (c *DocumentController) Import() {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		err = cmdcopyfile.Run()
+		output2, err2 := cmdcopyfile.output()
 		if err != nil {
-			beego.Error(err)
+			beego.Error(err2, output2)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
@@ -544,9 +544,9 @@ func (c *DocumentController) Import() {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		err = cmdcopyfile.Run()
+		output2, err2 = cmdcopyfile.output()
 		if err != nil {
-			beego.Error(err)
+			beego.Error(err2, output2)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
