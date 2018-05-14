@@ -272,10 +272,10 @@
                 <h4 class="modal-title">导入文件</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
-            					<input type="hidden" name="identify" value="{{.Model.Identify}}">
-                                <input type="hidden" name="doc_id" value="0">
-                                <input type="hidden" name="parent_id" value="0">
-								<input type="hidden" name="doc_identify" value="import">
+            		<input type="hidden" name="identify" value="{{.Model.Identify}}">
+                    <input type="hidden" name="doc_id" value="0">
+                    <input type="hidden" name="parent_id" value="0">
+					<input type="hidden" name="doc_identify" value="import">
             <div class="modal-body">
                 <div class="form-group">
                     <label>文档的名称</label>
