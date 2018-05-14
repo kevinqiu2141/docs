@@ -505,51 +505,32 @@ func (c *DocumentController) Import() {
 	defer file.Close()
 	io.Copy(file, f)
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
-	var webmediapath = path.Join(beego.AppConfig.String("baseurl"), localmediapath)
+	var webmediapath = path.Join("/", localmediapath)
 	beego.Debug("webmediapath: ", webmediapath)
 	if strings.HasSuffix(h.Filename, ".doc") {
-		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
+		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		output2, err2 := cmdcopyfile.Output()
-		if err2 != nil {
-			beego.Error(err2, output2)
-			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
-		}
-		doc.Release = string(output)
+		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
 	} else if strings.HasSuffix(h.Filename, ".docx") {
-		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
+		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		output2, err2 := cmdcopyfile.Output()
-		if err != nil {
-			beego.Error(err2, output2)
-			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
-		}
-		doc.Release = string(output)
-
+		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
 	} else if strings.HasSuffix(h.Filename, ".pdf") {
-		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("cp", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
+		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
-		output2, err2 := cmdcopyfile.Output()
-		if err != nil {
-			beego.Error(err2, output2)
-			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
-		}
-		doc.Release = string(output)
+		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
 	} else {
 		c.JsonResult(6103, "不支持的导入文件类型")
 	}
