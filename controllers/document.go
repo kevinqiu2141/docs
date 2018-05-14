@@ -15,7 +15,8 @@ import (
 	"image/png"
 	"path"
 	"bytes"
-
+	"io"
+	"os/exec"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -418,11 +419,6 @@ func (c *DocumentController) Import() {
 		if ok, err := regexp.MatchString(`[a-z]+[a-zA-Z0-9_.\-]*$`, doc_identify); !ok || err != nil {
 			c.JsonResult(6003, "文档标识只能包含小写字母、数字，以及“-”、“.”和“_”符号")
 		}
-
-		d, _ := models.NewDocument().FindByFieldFirst("identify", doc_identify)
-		if d.DocumentId > 0 && d.DocumentId != doc_id {
-			c.JsonResult(6006, "文档标识已被使用")
-		}
 	}
 
 	book_id := 0
@@ -498,7 +494,7 @@ func (c *DocumentController) Import() {
 		os.Mkdir(uploadpath, 0777)
 	}
 	var file *os.File
-	file, err = os.Create(uploadpath + "/" + h.Filename)
+	file, err = os.Create(uploadpath+"/"+h.Filename)
 	if err != nil {
 		beego.Error("failed to create")
 	}
@@ -507,8 +503,8 @@ func (c *DocumentController) Import() {
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
 	var webmediapath = path.Join(beego.AppConfig.String("baseurl"), localmediapath)
 
-	if strings.HasSuffix(h.FileName, ".doc") {
-		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+	if strings.HasSuffix(h.Filename, ".doc") {
+		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
 		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
 		cmd.Dir = beego.AppConfig.String("convert_dir")
 		output, err1 := cmd.Output()
@@ -521,10 +517,10 @@ func (c *DocumentController) Import() {
 			beego.Error(err)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
-		doc.release = string(output)
+		doc.Release = string(output)
 
-	} else if strings.HasSuffix(h.FileName, ".docx") {
-		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+	} else if strings.HasSuffix(h.Filename, ".docx") {
+		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
 		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
 		cmd.Dir = beego.AppConfig.String("convert_dir")
 		output, err1 := cmd.Output()
@@ -537,10 +533,10 @@ func (c *DocumentController) Import() {
 			beego.Error(err)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
-		doc.release = string(output)
+		doc.Release = string(output)
 
-	} else if strings.HasSuffix(h.FileName, ".pdf") {
-		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", "uploadpath + "/" + h.Filename", "--extract-media", webmediapath)
+	} else if strings.HasSuffix(h.Filename, ".pdf") {
+		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
 		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
 		cmd.Dir = beego.AppConfig.String("convert_dir")
 		output, err1 := cmd.Output()
@@ -553,14 +549,14 @@ func (c *DocumentController) Import() {
 			beego.Error(err)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
-		doc.release = string(output)
+		doc.Release = string(output)
 
 	}
-	if err := document.InsertOrUpdate(); err != nil {
+	if err := doc.InsertOrUpdate(); err != nil {
 		beego.Error("InsertOrUpdate => ", err)
 		c.JsonResult(6005, "保存失败")
 	} else {
-		c.JsonResult(0, "ok", document)
+		c.JsonResult(0, "ok", doc)
 	}
 
 }

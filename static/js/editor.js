@@ -54,6 +54,17 @@ function openCreateCatalogDialog($node) {
     $then.modal("show");
 }
 
+function openImportCatalogDialog($node) {
+    var $then =  $("#importModal");
+
+    var doc_id = $node ? $node.id : 0;
+
+    $then.find("input[name='parent_id']").val(doc_id);
+
+    $then.modal("show");
+}
+
+
 /**
  * 处理排序
  * @param node

@@ -318,6 +318,19 @@ $(function () {
                         openCreateCatalogDialog(node);
                     }
                 },
+                "导入": {
+                    "separator_before": false,
+                    "separator_after": true,
+                    "_disabled": false,
+                    "label": "导入文档",
+                    "icon": "fa fa-plus",
+                    "action": function (data) {
+                        var inst = $.jstree.reference(data.reference),
+                            node = inst.get_node(data.reference);
+
+                        openImportCatalogDialog(node);
+                    }
+                },
                 "编辑": {
                     "separator_before": false,
                     "separator_after": true,

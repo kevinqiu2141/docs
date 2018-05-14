@@ -78,8 +78,7 @@ func init() {
 	beego.Router("/docs/:key/search", &controllers.DocumentController{}, "post:Search")
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")
 	beego.Router("/qrcode/:key.png", &controllers.DocumentController{}, "get:QrCode")
-	beego.Router("/upload/:bookname/upload", &controllers.UploaderController{}, "*:Upload")
-	beego.Router("/upload/:bookname", &controllers.UploaderController{}, "*:Read")
+	beego.Router("/import", &controllers.DocumentController{}, "*:Import")
 	beego.Router("/attach_files/:key/:attach_id", &controllers.DocumentController{}, "get:DownloadAttachment")
 
 	beego.Router("/comment/create", &controllers.CommentController{}, "post:Create")
