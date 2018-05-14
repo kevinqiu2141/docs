@@ -506,7 +506,7 @@ func (c *DocumentController) Import() {
 	io.Copy(file, f)
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
 	var webmediapath = path.Join(beego.AppConfig.String("baseurl"), localmediapath)
-
+	beego.Debug("webmediapath: ", webmediapath)
 	if strings.HasSuffix(h.Filename, ".doc") {
 		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
 		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
@@ -526,12 +526,12 @@ func (c *DocumentController) Import() {
 		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
-			beego.Error(err1, output)
+			beego.Error(err1)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
 		err = cmdcopyfile.Run()
 		if err != nil {
-			beego.Error(err, output)
+			beego.Error(err)
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
