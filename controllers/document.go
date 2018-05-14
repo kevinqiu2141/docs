@@ -509,7 +509,7 @@ func (c *DocumentController) Import() {
 
 	if strings.HasSuffix(h.Filename, ".doc") {
 		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("copy", "-r", webmediapath + "/*", localmediapath)
+		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
@@ -523,7 +523,7 @@ func (c *DocumentController) Import() {
 		doc.Release = string(output)
 	} else if strings.HasSuffix(h.Filename, ".docx") {
 		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("copy", "-r", webmediapath + "/*", localmediapath)
+		cmdcopyfile := exec.Command("cp", "-r", webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1, output)
@@ -538,7 +538,7 @@ func (c *DocumentController) Import() {
 
 	} else if strings.HasSuffix(h.Filename, ".pdf") {
 		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", webmediapath)
-		cmdcopyfile := exec.Command("copy", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
+		cmdcopyfile := exec.Command("cp", "-r", beego.AppConfig.String("convert_dir") + webmediapath + "/*", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
 			beego.Error(err1)
@@ -550,7 +550,8 @@ func (c *DocumentController) Import() {
 			c.JsonResult(6101, "后端程序错误：拷贝media文件失败")
 		}
 		doc.Release = string(output)
-
+	} else {
+		c.JsonResult(6103, "不支持的导入文件类型")
 	}
 	if err := doc.InsertOrUpdate(); err != nil {
 		beego.Error("InsertOrUpdate => ", err, doc.BookId, doc.ParentId)
