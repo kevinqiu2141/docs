@@ -149,7 +149,7 @@ func (m *Document) ReleaseContent(bookId int) {
 		return
 	}
 	for _, item := range docs {
-		if item.Identify == "import" {
+		if strings.Contains(item.Identify, "import_mindoc") {
 			continue
 		}
 		if item.Content != "" {
