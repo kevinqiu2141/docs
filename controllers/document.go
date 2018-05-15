@@ -507,7 +507,7 @@ func (c *DocumentController) Import() {
 	io.Copy(file, f)
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
 	var webmediapath = path.Join("/", localmediapath)
-	fileExt = strings.Replace(path.Ext(h.Filename), ".", "", -1)
+	fileExt := strings.Replace(path.Ext(h.Filename), ".", "", -1)
 	cmd := exec.Command(pandoc, "-f", fileExt, "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 	output, err1 := cmd.Output()
 	if err1 != nil {
