@@ -507,33 +507,14 @@ func (c *DocumentController) Import() {
 	io.Copy(file, f)
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
 	var webmediapath = path.Join("/", localmediapath)
-	if strings.HasSuffix(h.Filename, ".doc") {
-		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
-		output, err1 := cmd.Output()
-		if err1 != nil {
-			beego.Error(err1, output)
-			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
-		}
-		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
-	} else if strings.HasSuffix(h.Filename, ".docx") {
-		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
-		output, err1 := cmd.Output()
-		if err1 != nil {
-			beego.Error(err1, output)
-			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
-		}
-		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
-	} else if strings.HasSuffix(h.Filename, ".pdf") {
-		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
-		output, err1 := cmd.Output()
-		if err1 != nil {
-			beego.Error(err1, output)
-			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
-		}
-		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
-	} else {
-		c.JsonResult(6103, "不支持的导入文件类型")
+	fileExt = strings.Replace(path.Ext(h.Filename), ".", "", -1)
+	cmd := exec.Command(pandoc, "-f", fileExt, "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
+	output, err1 := cmd.Output()
+	if err1 != nil {
+		beego.Error(err1, output)
+		c.JsonResult(6101, "后端程序错误：pandoc文件转换失败，可能导入了不支持的文件类型")
 	}
+	doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
 	if err := doc.InsertOrUpdate(); err != nil {
 		beego.Error("InsertOrUpdate => ", err, doc.BookId, doc.ParentId)
 		c.JsonResult(6005, "保存失败")
