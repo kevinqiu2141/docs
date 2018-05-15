@@ -455,6 +455,7 @@ func (c *DocumentController) Import() {
 	doc.Identify = doc_identify
 	doc.ParentId = parent_id
 	doc.MemberId = c.Member.MemberId
+	doc.Markdown = "导入的文档暂不支持修改"
 
 	if c.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -506,12 +507,11 @@ func (c *DocumentController) Import() {
 	io.Copy(file, f)
 	var localmediapath = path.Join("uploads/medias", strconv.FormatInt(time.Now().UnixNano(), 16), h.Filename)
 	var webmediapath = path.Join("/", localmediapath)
-	beego.Debug("webmediapath: ", webmediapath)
 	if strings.HasSuffix(h.Filename, ".doc") {
 		cmd := exec.Command(pandoc, "-f", "doc", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
-			beego.Error(err1)
+			beego.Error(err1, output)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
 		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
@@ -519,7 +519,7 @@ func (c *DocumentController) Import() {
 		cmd := exec.Command(pandoc, "-f", "docx", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
-			beego.Error(err1)
+			beego.Error(err1, output)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
 		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
@@ -527,7 +527,7 @@ func (c *DocumentController) Import() {
 		cmd := exec.Command(pandoc, "-f", "pdf", "-t", "html", uploadpath + "/" + h.Filename, "--extract-media", localmediapath)
 		output, err1 := cmd.Output()
 		if err1 != nil {
-			beego.Error(err1)
+			beego.Error(err1, output)
 			c.JsonResult(6101, "后端程序错误：pandoc文件转换失败")
 		}
 		doc.Release = strings.Replace(string(output), localmediapath, webmediapath, -1)
