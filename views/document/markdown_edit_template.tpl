@@ -19,6 +19,8 @@
         window.sortURL = "{{urlfor "BookController.SaveSort" ":key" .Model.Identify}}";
         window.historyURL = "{{urlfor "DocumentController.History"}}";
         window.removeAttachURL = "{{urlfor "DocumentController.RemoveAttachment"}}";
+        window.getdoc = "{{urlfor "DocumentController.GetDoc"}}"
+
     </script>
     <!-- Bootstrap -->
     <link href="{{cdncss "/static/bootstrap/css/bootstrap.min.css"}}" rel="stylesheet">
@@ -275,11 +277,14 @@
             		<input type="hidden" name="identify" value="{{.Model.Identify}}">
                 <input type="hidden" name="doc_id" value="0">
                 <input type="hidden" name="parent_id" value="0">
-					      <input type="hidden" name="doc_identify" value="import_mindoc">
             <div class="modal-body">
                 <div class="form-group">
                     <label>文档的名称</label>
                     <input class="form-control" name="doc_name" placeholder="文档的名称">
+                </div>
+                <div class="form-group">
+                    <label>文档的标识</label>
+                    <input class="form-control" name="doc_identify" placeholder="文档的标识">
                 </div>
                 <div id="uploader-demo" style="margin-top:30px;">
                     <input type="file" name="uploadname" vaule="选择文件"/>
@@ -313,6 +318,7 @@
 <script src="{{cdnjs "/static/js/jquery.form.js"}}" type="text/javascript"></script>
 <script src="{{cdnjs "/static/js/editor.js"}}" type="text/javascript"></script>
 <script src="{{cdnjs "/static/js/markdown.js"}}" type="text/javascript"></script>
+<script src="{{cdnjs "/static/js/diff_match_patch.js"}}" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
 

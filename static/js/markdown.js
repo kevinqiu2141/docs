@@ -179,7 +179,8 @@ $(function () {
         var content = window.editor.getMarkdown();
         var html = window.editor.getPreviewedHTML();
         var version = "";
-
+        var historycontent = "";
+        var ds
         if (!node) {
             layer.msg("获取当前文档信息失败");
             return;
@@ -196,11 +197,27 @@ $(function () {
             }
         }
         $.ajax({
+          url: window.getdoc,
+          data: { "id": doc_id },
+          type: "post",
+          timeout : 30000,
+          dataType: "json",
+          success: function (res) {
+            var dmp = new diff_match_patch();
+            historycontent = res.content
+            var d = dmp.diff_main(historycontent, content);
+            ds = dmp.diff_prettyHtml(d);
+          }
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.error("failed to get doc info from api")
+          }
+        });
+        $.ajax({
             beforeSend: function () {
                 index = layer.load(1, { shade: [0.1, '#fff'] });
             },
             url: window.editURL,
-            data: { "identify": window.book.identify, "doc_id": doc_id, "markdown": content, "html": html, "cover": $is_cover ? "yes" : "no", "version": version },
+            data: { "identify": window.book.identify, "doc_id": doc_id, "markdown": content, "diff": ds, "html": html, "cover": $is_cover ? "yes" : "no", "version": version },
             type: "post",
             timeout : 30000,
             dataType: "json",
@@ -236,7 +253,7 @@ $(function () {
             }
         });
     }
-    
+
 
     /**
      * 设置编辑器变更状态

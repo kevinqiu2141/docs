@@ -258,6 +258,17 @@ func (c *DocumentController) Read() {
 	c.Data["Content"] = template.HTML(doc.Release)
 }
 
+func (c *DocumentController) GetDoc() {
+	c.Prepare()
+	doc_id := c.GetString("id")
+	doc, err := models.NewDocument().Find(id)
+	if err != nil {
+		c.JsonResult(6010, "查询文档失败")
+	}
+	c.Data["json"] = &doc
+	c.ServeJSON()
+}
+
 // 编辑文档
 func (c *DocumentController) Edit() {
 	c.Prepare()
@@ -401,10 +412,16 @@ func (c *DocumentController) Create() {
 	}
 }
 
+func (c *DocumentController) Output() {
+	doc_id := c.GetInt("doc_id")
+	doc, err := models.NewDocument().Find(doc_id)
+
+}
+
 func (c *DocumentController) Import() {
 	identify := c.GetString("identify")
 	doc_name := c.GetString("doc_name")
-	doc_identify := c.GetString("doc_identify")+strconv.FormatInt(time.Now().UnixNano(), 16)
+	doc_identify := c.GetString("doc_identify")
 	parent_id, _ := c.GetInt("parent_id", 0)
 
 	if identify == "" {
@@ -456,7 +473,7 @@ func (c *DocumentController) Import() {
 	doc.ParentId = parent_id
 	doc.MemberId = c.Member.MemberId
 	doc.Markdown = "导入的文档暂不支持修改"
-
+	doc.Editor = "html"
 	if c.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
@@ -847,7 +864,7 @@ func (c *DocumentController) Delete() {
 // 获取文档内容
 func (c *DocumentController) Content() {
 	c.Prepare()
-
+	diff := c.GetString("diff")
 	identify := c.Ctx.Input.Param(":key")
 	docId, err := c.GetInt("doc_id")
 
@@ -888,7 +905,7 @@ func (c *DocumentController) Content() {
 		content := c.GetString("html")
 		version, _ := c.GetInt64("version", 0)
 		isCover := c.GetString("cover")
-
+		diff := c.Getstring("diff)
 		doc, err := models.NewDocument().Find(docId)
 
 		if err != nil {
@@ -924,6 +941,8 @@ func (c *DocumentController) Content() {
 
 		doc.Version = time.Now().Unix()
 		doc.Content = content
+		doc.Status = "saved"
+		doc.Diff = diff
 
 		if err := doc.InsertOrUpdate(); err != nil {
 			beego.Error("InsertOrUpdate => ", err)

@@ -19,6 +19,7 @@ import (
 	"github.com/1009049035/mindoc/graphics"
 	"github.com/1009049035/mindoc/models"
 	"github.com/1009049035/mindoc/utils"
+	"github.com/1009049035/mindoc/mail"
 	"github.com/1009049035/mindoc/utils/pagination"
 	"net/http"
 	"github.com/1009049035/mindoc/converter"
@@ -621,10 +622,17 @@ func (c *BookController) Release() {
 			c.JsonResult(6003, "权限不足")
 		}
 		bookId = book.BookId
+
 	}
 	go func(identify string) {
 		models.NewDocument().ReleaseContent(bookId)
-
+		docs, err := models.NewDocument().FindListByBookId(bookId)
+		for _, doc := range docs {
+			if doc.Status == "saved" {
+				users := strings.Split(doc.Watcher, " ")
+				SendMail(users, doc.DocumentName, doc.Diff)
+			}
+		}
 		//当文档发布后，需要删除已缓存的转换项目
 		outputPath := filepath.Join(beego.AppConfig.DefaultString("book_output_path", "cache"), strconv.Itoa(bookId))
 		os.RemoveAll(outputPath)
@@ -713,6 +721,35 @@ func (c *BookController) SaveSort() {
 	}
 	c.JsonResult(0, "ok")
 }
+
+func SendMail(users []string, docname string, diff string) {
+	conf := &mail.SMTPConfig{
+		Username: beego.AppConfig.String("smtp_user_name"),
+		Password: beego.AppConfig.String("smtp_password"),
+		Host:     beego.AppConfig.String("smtp_host"),
+		Port:     beego.AppConfig.String("smtp_port"),
+		Secure:   beego.AppConfig.String("secure"),
+	}
+	client := mail.NewSMTPClient(conf)
+	m := mail.NewMail()
+	for _, user := range users {
+		member, err := models.NewMember().FindByAccount(user)
+		if err != nil {
+			beego.Error(err)
+		}
+		email_address := member.Email
+		m.AddTo("brother " + email_address)
+	}
+	m.AddFrom("mindoc <" + conf.Username + ">")
+	m.AddSubject(docname + " 被修改了")
+	m.AddHTML(diff)
+	if err1 := client.Send(m); err1 != nil {
+		beego.Error(err1)
+	} else {
+		beego.Log("发送成功")
+	}
+}
+
 
 func (c *BookController) IsPermission() (*models.BookResult, error) {
 	identify := c.GetString("identify")

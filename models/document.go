@@ -29,8 +29,12 @@ type Document struct {
 	Markdown string `orm:"column(markdown);type(text);null" json:"markdown"`
 	// Release 发布后的Html格式内容.
 	Release string `orm:"column(release);type(text);null" json:"release"`
+	Watcher string `orm:"column(watcher);type(text);null" json:"watcher"`
+	Editor string `orm:"column(editor);type(text);null" json:"editor"`
+	Status string `orm:"column(status);type(text);null" json:"status"`
 	// Content 未发布的 Html 格式内容.
 	Content    string        `orm:"column(content);type(text);null" json:"content"`
+	Diff string `orm:"column(diff);type(text);null" json:"diff"`
 	CreateTime time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
 	MemberId   int           `orm:"column(member_id);type(int)" json:"member_id"`
 	ModifyTime time.Time     `orm:"column(modify_time);type(datetime);auto_now" json:"modify_time"`
@@ -149,7 +153,7 @@ func (m *Document) ReleaseContent(bookId int) {
 		return
 	}
 	for _, item := range docs {
-		if strings.Contains(item.Identify, "import_mindoc") {
+		if docs.Editor == "html" {
 			continue
 		}
 		if item.Content != "" {
@@ -174,6 +178,8 @@ func (m *Document) ReleaseContent(bookId int) {
 				})
 			}
 		}
+
+
 
 		attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
 		if err == nil && len(attachList) > 0 {
